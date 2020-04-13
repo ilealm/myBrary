@@ -45,77 +45,79 @@ router.post('/', async (req, res) => {
 
   try {
     const newBook = await book.save()
-    // res.redirect(`books/${newBook.id}`)
-    res.redirect(`books`);
+    res.redirect(`books/${newBook.id}`)
   } catch {
     renderNewPage(res, book, true)
   }
 })
 
+
+// .populate creates an onbject linked to another schema, like sql join. 
+// BD it return an object, we can use book.author.name 
 // Show Book Route
 router.get('/:id', async (req, res) => {
-  // try {
-  //   const book = await Book.findById(req.params.id)
-  //                          .populate('author')
-  //                          .exec()
-  //   res.render('books/show', { book: book })
-  // } catch {
-  //   res.redirect('/')
-  // }
+  try {
+    const book = await Book.findById(req.params.id)
+                           .populate('author')
+                           .exec()
+    res.render('books/show', { book: book })
+  } catch {
+    res.redirect('/')
+  }
 })
 
 // Edit Book Route
 router.get('/:id/edit', async (req, res) => {
-  // try {
-  //   const book = await Book.findById(req.params.id)
-  //   renderEditPage(res, book)
-  // } catch {
-  //   res.redirect('/')
-  // }
+  try {
+    const book = await Book.findById(req.params.id)
+    renderEditPage(res, book)
+  } catch {
+    res.redirect('/')
+  }
 })
 
 // Update Book Route
 router.put('/:id', async (req, res) => {
-  // let book
+  let book //outside the try so catch can access to it
 
-  // try {
-  //   book = await Book.findById(req.params.id)
-  //   book.title = req.body.title
-  //   book.author = req.body.author
-  //   book.publishDate = new Date(req.body.publishDate)
-  //   book.pageCount = req.body.pageCount
-  //   book.description = req.body.description
-  //   if (req.body.cover != null && req.body.cover !== '') {
-  //     saveCover(book, req.body.cover)
-  //   }
-  //   await book.save()
-  //   res.redirect(`/books/${book.id}`)
-  // } catch {
-  //   if (book != null) {
-  //     renderEditPage(res, book, true)
-  //   } else {
-  //     redirect('/')
-  //   }
-  // }
+  try {
+    book = await Book.findById(req.params.id)
+    book.title = req.body.title
+    book.author = req.body.author
+    book.publishDate = new Date(req.body.publishDate)
+    book.pageCount = req.body.pageCount
+    book.description = req.body.description
+    if (req.body.cover != null && req.body.cover !== '') {
+      saveCover(book, req.body.cover)
+    }
+    await book.save()
+    res.redirect(`/books/${book.id}`)
+  } catch {
+    if (book != null) {
+      renderEditPage(res, book, true)
+    } else {
+      redirect('/')
+    }
+  }
 })
 
 // Delete Book Page
 router.delete('/:id', async (req, res) => {
-  // let book
-  // try {
-  //   book = await Book.findById(req.params.id)
-  //   await book.remove()
-  //   res.redirect('/books')
-  // } catch {
-  //   if (book != null) {
-  //     res.render('books/show', {
-  //       book: book,
-  //       errorMessage: 'Could not remove book'
-  //     })
-  //   } else {
-  //     res.redirect('/')
-  //   }
-  // }
+  let book
+  try {
+    book = await Book.findById(req.params.id)
+    await book.remove()
+    res.redirect('/books')
+  } catch {
+    if (book != null) {
+      res.render('books/show', {
+        book: book,
+        errorMessage: 'Could not remove book'
+      })
+    } else {
+      res.redirect('/')
+    }
+  }
 })
 
 async function renderNewPage(res, book, hasError = false) {
@@ -123,7 +125,7 @@ async function renderNewPage(res, book, hasError = false) {
 }
 
 async function renderEditPage(res, book, hasError = false) {
-  // renderFormPage(res, book, 'edit', hasError)
+  renderFormPage(res, book, 'edit', hasError)
 }
 
 async function renderFormPage(res, book, form, hasError = false) {
