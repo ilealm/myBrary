@@ -1,0 +1,15 @@
+ <!-- we want to use a delete in a get data is BC search engines clikes on the links 
+  in orden to index the pages. if we usea a <a> to delete the search engines will click 
+    an delete everything in the app. This is why we need a FORM to delete and use method override.
+    never ever use get to delete data 
+    the method=POST will be overwritten by ?_method=DELETE | PUT . 
+    _method is the variable we use defined on server app.use(methodOverride('_method'))
+    The delete form will be in a partial
+
+    we are going to change the action to a dinamic URL
+    insted of
+    action="/authors/< % = author.id %>?_method=DELETE"
+  -->
+  <form method="POST" action="<%= url %>?_method=DELETE">
+    <button type="submit">Delete</button>
+  </form>

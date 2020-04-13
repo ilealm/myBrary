@@ -7,4 +7,18 @@
 <br>
 <% authors.forEach(author => { %>
   <div> <%= author.name %></div>
+  <a href="/authors/<%= author.id%>">View</a>
+  <a href="/authors/<%= author.id%>/edit">Edit</a>
+  <!-- we want to use a delete in a get data is BC search engines clikes on the links 
+  in orden to index the pages. if we usea a <a> to delete the search engines will click 
+    an delete everything in the app. This is why we need a FORM to delete and use method override.
+    never ever use get to delete data 
+    the method=POST will be overwritten by ?_method=DELETE | PUT . 
+    _method is the variable we use defined on server app.use(methodOverride('_method'))
+    The delete form will be in a partial
+  -->
+    <!-- <form method="POST" action="/authors/< % = author.id %>?_method=DELETE">
+      <button type="submit">Delete</button>
+    </form> -->
+    <%- include('../partials/deleteForm', {url: `/authors/${author.id}`}) %>
 <% }) %>

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Author = require('../modules/author'); //this create an instance of the author model. not addig to DB jet
+const Book = require('../modules/book')
 
 // All authors route. localhost/authors
 router.get('/', async(req,res) =>{
@@ -20,10 +21,12 @@ router.get('/', async(req,res) =>{
   }
 })
 
-// New author route. This just display the form
+// New author route. This just display the form.
+// This route SOULDS be the next route afer '/' route, BC routes like '/:id' can be confused as 
 router.get('/new', (req, res) =>{
   res.render('authors/new',{author:new Author()});
 })
+
 //Create author route we use POST bc is creation
 router.post('/', async (req, res) =>{
   //to ensure that we save only the name in the DB
@@ -32,8 +35,7 @@ router.post('/', async (req, res) =>{
   })
   try{  //await works WITH PROMESSES. and they wait to the promesse to be resolved. Only works on an async function
     const newAuthor = await author.save(); //is going to wait to save the author, and theb asign it to the variable, BC mongoos is async, and we need to wait
-   // res.redirect(`authors/${newAuthor.id}`);
-      res.redirect(`authors`);
+   res.redirect(`authors/${newAuthor.id}`);
   } catch {
       res.render('authors/new', {
       author: author,
@@ -41,6 +43,78 @@ router.post('/', async (req, res) =>{
     })
   }
 })
+
+// this route needs to be defined after the new route, BS the app can think that "new" is an id
+// req.params,id makes referece to /:id
+router.get('/:id', async (req, res) => {
+  try {
+    const author = await Author.findById(req.params.id)
+    const books = await Book.find({ author: author.id }).limit(6).exec()
+    res.render('authors/show', {
+      author: author,
+      booksByAuthor: books
+    })
+  } catch(err) {
+    console.log(err)
+    res.redirect('/')
+  }
+})
+
+// we use edit to follow REST .
+router.get('/:id/edit', async (req, res) =>{
+  try{
+    // select all the info for the autor and render edit page.
+    const author = await Author.findById(req.params.id)
+    res.render('authors/edit',{author: author});
+
+  }
+  catch(err){
+    console.log("Error on editing Author: ", err.message);
+    res.redirect('/authors');
+  }
+})
+
+// the browser can only do a get and post. For put and delete we need the libraty method-override
+//method-override allows to take a post form, send to the server with an especial parameter that tells if is a put or delete, and the server will call the correct
+// route bases on the specific parameter
+// update route. In REST we use the word put in order to define UPDATE routes 
+router.put('/:id', async (req, res) => {
+  let author //we are not going to set to anything later will be settle. and is outside the try so the catch can use use it
+  try {
+    author = await Author.findById(req.params.id)
+    author.name = req.body.name; //this are the new value
+    await author.save()
+    res.redirect(`/authors/${author.id}`)
+  } catch(err) {
+    if (author == null) {
+      res.redirect('/')
+    } else {
+      console.log("Error on saving the edited Author: ", err.message);
+      res.render('authors/edit', {
+        author: author,
+        errorMessage: 'Error updating Author'
+      })
+    }
+  }
+})
+
+// we use delete to follow REST 
+////we are not going to set to anything later will be settle. and is outside the try so the catch can use use it
+router.delete('/:id', async (req, res) => {
+  let author
+  try {
+    author = await Author.findById(req.params.id)
+    await author.remove()
+    res.redirect('/authors')
+  } catch {
+    if (author == null) {
+      res.redirect('/')
+    } else {
+      res.redirect(`/authors/${author.id}`)
+    }
+  }
+})
+
 
 
 module.exports = router;

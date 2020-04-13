@@ -6,7 +6,8 @@ const express = require('express');
 const app = express();
 const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser'); //to easily obtain the data the server is sending on the forms 
-
+const methodOverride = require('method-override') ; //method-override allows to take a post form, send to the server with an especial parameter that tells if is a put or delete, and the server will call the correct
+// route bases on the specific parameter
 const indexRouter = require('./routes/index'); //this is not a route, is a folder path. Module name is prefixed with ./, as it’s a local file. Also note that there’s no need to add the file extension.
 const authorRouter = require('./routes/authors');  // here we are saying what to do with all the routes of this type
 const bookRouter = require('./routes/books'); 
@@ -15,6 +16,8 @@ app.set('view engine', 'ejs');  // this indicate the template we want to use, ej
 app.set('views', __dirname + '/views'); // where the template files are located. __dirname gives the ABSOLUTE PATH 
 app.set('layout', 'layouts/layout'); // all res.renders will be desplayed here, on -body
 app.use(expressLayouts);
+app.use(methodOverride('_method')); // _method is the parameter to let overrride knows how to treat the route. 
+// We use _method BS is unlikely to use this as a name of our form. After this we append PUT or DELETE
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({limit : '10mb', extended:false})) //to easily read forms values and ingreasing when we upload files. Parses query string data in the URL (e.g. /profile?id=5) and puts this in request.query
 
