@@ -9,6 +9,7 @@ const bodyParser = require('body-parser'); //to easily obtain the data the serve
 
 const indexRouter = require('./routes/index'); //this is not a route, is a folder path. Module name is prefixed with ./, as it’s a local file. Also note that there’s no need to add the file extension.
 const authorRouter = require('./routes/authors');  // here we are saying what to do with all the routes of this type
+const bookRouter = require('./routes/books'); 
 
 app.set('view engine', 'ejs');  // this indicate the template we want to use, ejs, pug, mustache...BC template is related to express, we do app.set
 app.set('views', __dirname + '/views'); // where the template files are located. __dirname gives the ABSOLUTE PATH 
@@ -26,5 +27,6 @@ bd.once('open', () => console.log('Connected to Mongoose') );
 
 app.use('/', indexRouter); // route files that were required are attached to our app
 app.use('/authors', authorRouter); //here we are collecting all the calls for this route and send the manage to the author route
+app.use('/books', bookRouter);
 
 app.listen(process.env.PORT || 3000);

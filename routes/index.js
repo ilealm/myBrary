@@ -1,8 +1,15 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
+const Book = require('../modules/book')
 
-router.get('/',(req, res) =>{
-  res.render('index'); //whatever we pass here, will be render on -body. we dont need to specify ext BC in view engine we said the template method, ans index from views
+router.get('/', async (req, res) => {
+  let books
+  try {
+    books = await Book.find().sort({ createdAt: 'desc' }).limit(10).exec()
+  } catch {
+    books = []
+  }
+  res.render('index', { books: books })
 })
 
 module.exports = router;

@@ -10,6 +10,7 @@ router.get('/', async(req,res) =>{
   }
   try{
     const authors = await Author.find(searchOptions);
+    // when we render, we don put the initial / in the path
     res.render('authors/index', 
       {authors:authors,
       searchOptions:req.query
